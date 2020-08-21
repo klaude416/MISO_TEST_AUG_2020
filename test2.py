@@ -54,6 +54,14 @@ def help_and_exit():
     print(f'{sys.argv[0]} [non-negative integer] [non-negative integer]')
     sys.exit(1)
 
+def _parse_partial_korean_num(num, num_unit = 1):
+    if not num and num_unit > 1:
+        return num_unit
+    elif not num and num_unit == 1:
+        return 0
+    else:
+        return ARR_KOREAN_STR_NUM.index(num) * num_unit
+
 def _parse_thousand_unit(preunit, num_unit):
     # In case of letter is blank as a big number
     if not preunit and num_unit > 10 ** 3: return num_unit
@@ -63,14 +71,14 @@ def _parse_thousand_unit(preunit, num_unit):
         try:
             idx = preunit.index(str_unit)
             num = preunit[str_idx:idx]
-            tot += (1 if num == '' else ARR_KOREAN_STR_NUM.index(num)) * DIC_KOREAN_WON[str_unit]
+            tot += _parse_partial_korean_num(num, DIC_KOREAN_WON[str_unit])
             str_idx = idx + 1
         except ValueError: #when preunit has not index of str_unit
             pass
         except:
             print('unexpected error')
-    num = preunit[str_idx:]
-    tot += 0 if num == '' else ARR_KOREAN_STR_NUM.index(num)
+
+    tot += _parse_partial_korean_num(preunit[str_idx:], 1)
     return tot * num_unit
 
 def parse_int_from_korean_won(str_won):
